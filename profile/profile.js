@@ -1,15 +1,18 @@
 import '../auth/user.js';
+import { getProfile, getUser, updateProfile } from '../fetch-utils.js';
 // > Part A: import updateProfile from fetch-utils.js
 // > Part B: import getUser and getProfile from fetch-utils.js
 
 // > Part B: get the user
-const user = null; // ???
+const user = getUser();
 
 const errorDisplay = document.getElementById('error-display');
 const profileForm = document.getElementById('profile-form');
 const updateButton = profileForm.querySelector('button');
 const userNameInput = profileForm.querySelector('[name=user_name]');
 const bioTextArea = profileForm.querySelector('[name=bio]');
+
+// const preview = document.getElementById('preview');
 
 let profile = null;
 let error = null;
@@ -18,6 +21,9 @@ window.addEventListener('load', async () => {
     // > Part B:
     //      - get the profile based on user.id
     //      - set profile and error state from response object
+    const response = await getProfile(user.id);
+    error = response.error;
+    profile = response.data;
 
     if (error) {
         displayError();
@@ -45,8 +51,14 @@ profileForm.addEventListener('submit', async (e) => {
 
     // > Part A
     //      - create a profile update object
-    //      - call updateProfile passing in profile update object, capture the response
-    const response = null; // ??????
+    // initial profile update
+    const profileUpdate = {
+        user_name: formData.get('user_name'),
+        bio: formData.get('bio'),
+    };
+
+    // - call updateProfile passing in profile update object, capture the response
+    const response = await updateProfile(profileUpdate);
 
     error = response.error;
 
@@ -60,12 +72,20 @@ profileForm.addEventListener('submit', async (e) => {
         updateButton.textContent = buttonText;
     } else {
         // > Part A: uncomment when working to redirect user
-        // location.assign('../');
+        location.assign('../');
     }
 });
 
 function displayProfile() {
     // > Part B: update user name and bio from profile object
+    if (profile) {
+        userNameInput.value = profile.user_name;
+        bioTextArea.value = profile.bio;
+        // load preview of existing profile
+        // if (profile.avatar_url) {
+        //     preview.src = profile.avatar_url;
+        // }
+    }
 }
 
 function displayError() {
